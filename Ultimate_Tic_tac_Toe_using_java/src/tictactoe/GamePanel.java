@@ -3,18 +3,23 @@ package tictactoe;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-
 import javax.swing.event.MouseInputListener;
 
 public class GamePanel extends Panel implements MouseMotionListener, MouseInputListener{
 
+	private Grid grid;
+	
 	public GamePanel(Color color) {
 		super(color);
+		
+		grid = new Grid();
 	}
 	
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
+		
+		grid.update(deltaTime);
 		
 		
 //		todo : update elements
@@ -24,7 +29,7 @@ public class GamePanel extends Panel implements MouseMotionListener, MouseInputL
 	public void render() {
 		super.render();
 		
-		
+		grid.render(graphicsRender);
 		
 		super.clear();
 	}

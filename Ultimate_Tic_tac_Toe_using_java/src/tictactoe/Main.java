@@ -23,7 +23,9 @@ public class Main {
 		frame.addMouseListener(game);
 		frame.addMouseMotionListener(game);
 		
-		frame.setSize(WIDTH, HEIGHT);
+		frame.pack();  //set size based on the components
+		frame.setResizable(false);    //stop that we can't increse or decrese size
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
