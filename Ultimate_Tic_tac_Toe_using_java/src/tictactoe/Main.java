@@ -1,5 +1,7 @@
 package tictactoe;
 
+import java.awt.Color;
+
 import javax.swing.JFrame;
 
 public class Main {
@@ -15,6 +17,11 @@ public class Main {
 	
 	public static void main(String args[]) {
 		JFrame frame = new JFrame("Tic-Tac-Toe :)");
+		GamePanel game = new GamePanel(new Color(0x464646));
+		
+		frame.add(game);
+		frame.addMouseListener(game);
+		frame.addMouseMotionListener(game);
 		
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
