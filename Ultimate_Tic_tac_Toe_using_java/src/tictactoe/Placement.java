@@ -27,6 +27,7 @@ public class Placement implements IGameObject{
 		this.height=height;
 	}
 
+
 	@Override
 	public void update(float deltatime) {
 		
@@ -44,6 +45,24 @@ public class Placement implements IGameObject{
 		
 		graphicsRender.setColor(Color.white);
 	}
+	
+	public void checkCollision(int x, int y) {
+		if(x>this.x && x<this.x + width && y>this.y && y<this.y + height) {
+			fadeIn = true;
+		}
+		else {
+			fadeIn = false;
+		}
+	}
+	
+	public int getxIndex() {
+		return xIndex;
+	}
+
+	public int getyIndex() {
+		return yIndex;
+	}
+
 	
 
 }

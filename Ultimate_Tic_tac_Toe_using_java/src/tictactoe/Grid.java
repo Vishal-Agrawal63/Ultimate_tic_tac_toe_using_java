@@ -28,10 +28,12 @@ public class Grid implements IGameObject{
 		
 		int rowSize = Main.WIDTH / Main.ROWS;
 		
-		for (int i = 0; i < Main.ROWS+1; i++) {
+		for (int i = 0; i < Main.ROWS+1; i++) { //for vertical lines
 			
 			graphicsRender.fillRect(i*rowSize - (gridThickness / 2), 0, gridThickness, Main.WIDTH);
-			for (int j = 0; j < Main.ROWS+1; j++) {
+			
+			for (int j = 0; j < Main.ROWS+1; j++) { // for horizontal lines
+				
 				graphicsRender.fillRect( 0,j*rowSize - (gridThickness / 2), Main.WIDTH, gridThickness);
 			}
 		}
