@@ -31,6 +31,20 @@ public class Placement implements IGameObject{
 	@Override
 	public void update(float deltatime) {
 		
+		if(fadeIn && alpha!=1) {
+			alpha +=fadespeed;
+			if(alpha>1) {
+				alpha=1;
+			}
+		}
+		else if(!fadeIn && alpha!=0){
+			alpha -= fadespeed;
+			if(alpha < 0) {
+				alpha = 0;
+			}
+			
+		}
+		
 	}
 
 	@Override

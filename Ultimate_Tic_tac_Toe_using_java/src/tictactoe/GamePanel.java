@@ -78,6 +78,8 @@ public class GamePanel extends Panel implements MouseMotionListener, MouseInputL
 	public void mouseMoved(MouseEvent e) {
 //		System.out.println("moved!");
 		
+		grid.mouseMoved(e);
+		
 	}
 
 	
