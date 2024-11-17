@@ -57,6 +57,7 @@ public class GamePanel extends Panel implements MouseMotionListener, MouseInputL
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		grid.mouseReleased(e);
 	}
 
 	@Override

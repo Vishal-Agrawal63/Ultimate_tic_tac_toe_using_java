@@ -61,6 +61,12 @@ public class Placement implements IGameObject{
 	}
 	
 	public void checkCollision(int x, int y) {
+		
+//		check if 'x' or 'o' is placed
+		if(markerPlaced) {
+			return;
+		}
+		
 		if(x>this.x && x<this.x + width && y>this.y && y<this.y + height) {
 			fadeIn = true;
 		}
@@ -77,6 +83,17 @@ public class Placement implements IGameObject{
 		return yIndex;
 	}
 
+	public boolean isActive() {
+		return fadeIn;
+	}
+	
+	public void set(boolean isSet) {
+		markerPlaced = isSet;
+		
+		if(isSet) {
+			fadeIn = false;
+		}
+	}
 	
 
 }
