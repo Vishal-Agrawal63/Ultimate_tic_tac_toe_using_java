@@ -6,8 +6,8 @@ import javax.swing.JFrame;
 
 public class Main {
 	
-	public static int WIDTH = 300;
-	public static int HEIGHT = 300;
+	public static int WIDTH = 500;
+	public static int HEIGHT = 500;
 	
 	public static int ROWS = 3;
 	public static int MATCH = 3;

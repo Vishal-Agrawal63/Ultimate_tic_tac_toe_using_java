@@ -100,9 +100,35 @@ public class Grid implements IGameObject{
 		
 		graphicsRender.setColor(Color.white);
 		
+		if(gameEnd) {
+			drawEndGameOverlay(graphicsRender);
+		}
+		
 	}
 	
+	private void drawEndGameOverlay(Graphics2D graphicsRender) {
+		graphicsRender.setColor(new Color(0,0,0, (int)(225 * 0.5f)));
+		
+		graphicsRender.fillRect(0, 0, Main.WIDTH, Main.HEIGHT);
+		graphicsRender.setColor(Color.white);
+		
+		if(winType == -1) {
+			//tie
+			graphicsRender.drawString("It's a TIE", 195, 235);
+		}else {
+			//won
+			graphicsRender.drawString((winType == 0 ? "X" : "O") + " has WON!", 175, 235);
+		}
+		
+		graphicsRender.drawString("Press anywhere to restart! :)", 85, 260);
+		
+	}
+
 	public void mouseMoved(MouseEvent e) {
+		if(gameEnd) {
+			return;
+		}
+		
 		for (Placement placement : placements) {
 			placement.checkCollision(e.getX(), e.getY() - 30);
 		}
@@ -112,11 +138,27 @@ public class Grid implements IGameObject{
 		for (Placement placement : placements) {
 			if(placement.isActive()) {
 				
+				placement.set(true);
+				
 				int x = placement.getxIndex();
 				int y = placement.getyIndex();
 				markers[x][y] = new Marker(x, y, markerIndex);
 				
 				markerIndex ++;
+				
+				//check if player won?
+				ArrayList<Marker> winLine = Checker.checkWin(markers);
+				
+				
+				if(winLine!=null) {
+					winLine.forEach(marker -> marker.setWon(true));
+					winType = winLine.get(0).getType();
+					gameEnd = true;
+					
+				}else if(markerIndex >= Main.SIZE) {
+					gameEnd = true;
+				}
+				
 			}
 		}
 		
@@ -136,6 +178,10 @@ public class Grid implements IGameObject{
 		gameEnd = false;
 		winType = -1;
 		markerIndex = 0;
+	}
+	
+	public boolean isGameEnd() {
+		return gameEnd;
 	}
 	
 
