@@ -83,4 +83,9 @@ public class Checker {
 			
 			return match.size() >= Main.MATCH ? match : null; 
 		}
+		
+		public static int getWinType(Marker[][] markers) {
+			ArrayList<Marker> match = checkWin(markers);
+			return match == null ? -1 : match.get(0).getType();
+		}
 }

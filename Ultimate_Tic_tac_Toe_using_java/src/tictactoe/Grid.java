@@ -9,15 +9,44 @@ import java.util.Iterator;
 public class Grid implements IGameObject{
 	
 	private ArrayList<Placement> placements = new ArrayList<Placement>(Main.SIZE);
+	private ArrayList<Marker> winLine;
 	private Marker[][] markers;
 	
-	private int gridThickness = 16;
+	private int gridThickness = 6;
 	private int markerIndex = 0;
+	private int markersPlaced = 0;
+	
 	private boolean gameEnd = false;
+	private boolean isActive = true;
+	
 	private int winType = -1;
 	
-	public Grid() {
+	private int x;
+	private int y;
+	
+	private int startX;
+	private int startY;
+	
+	private int size;
+	
+	private boolean drawGrid = true;
+	private boolean drawActive = true;
+	
+	public Grid(int x,int y, int size, boolean drawGrid, boolean drawActive) {
+		this(x,y,size);
 		
+		this.drawGrid = drawGrid;
+		this.drawActive = drawActive;
+	}
+	
+	public Grid(int x,int y,int size) {
+		
+		this.size = size;
+		this.x = x;
+		this.y = y;
+		
+		startX = x * size;
+		startY = y*size;
 		
 //		find the marker
 		markers = new Marker[Main.ROWS][Main.ROWS];
@@ -31,9 +60,9 @@ public class Grid implements IGameObject{
 			
 			int yIndex = i / Main.ROWS;
 			
-			int size = Main.WIDTH / Main.ROWS;
+			int cellSize = size / Main.ROWS;
 			
-			placements.add(new Placement(xIndex * size, yIndex*size,xIndex, yIndex,size,size));
+			placements.add(new Placement(startX + xIndex * cellSize, startY + yIndex*cellSize,xIndex, yIndex,cellSize,cellSize));
 		}
 		
 		reset();
@@ -61,6 +90,10 @@ public class Grid implements IGameObject{
 	@Override
 	public void render(Graphics2D graphicsRender) {
 		
+		if(isActive && drawActive) {
+			drawActiveBackground(graphicsRender);
+		}
+		
 		for(Placement placement : placements) {
 			placement.render(graphicsRender);
 		}
@@ -76,24 +109,35 @@ public class Grid implements IGameObject{
 			}
 		}
 		
-		
-		renderGrid(graphicsRender);
+		if(drawGrid) {
+			renderGrid(graphicsRender);
+		}
+	}
+
+	private void drawActiveBackground(Graphics2D graphicsRender) {
+		graphicsRender.setColor(new Color(0x305635));
+		graphicsRender.fillRect(startX, startY, size, size);
+
+		graphicsRender.setColor(Color.white);
 	}
 
 	private void renderGrid(Graphics2D graphicsRender) {
 		
 		graphicsRender.setColor(new Color(0x2e2e2e));
 		
-		int rowSize = Main.WIDTH / Main.ROWS;
+		int rowSize = size / Main.ROWS;
 		
-		for (int i = 0; i < Main.ROWS+1; i++) { //for vertical lines
+		for (int i = 0; i < Main.ROWS+1; i++) { 
 			
-			graphicsRender.fillRect(i*rowSize - (gridThickness / 2), 0, gridThickness, Main.WIDTH);
+			int thickness = gridThickness;
 			
-			for (int j = 0; j < Main.ROWS+1; j++) { // for horizontal lines
-				
-				graphicsRender.fillRect( 0,j*rowSize - (gridThickness / 2), Main.WIDTH, gridThickness);
+			if(i==0 || i == Main.ROWS) {
+				thickness *= 2;
 			}
+			
+			graphicsRender.fillRect(startX + i*rowSize - (thickness / 2), startY, thickness, size);
+			graphicsRender.fillRect( startX,startY + i*rowSize - (thickness / 2), size, thickness);
+		
 		}
 		
 		
@@ -101,31 +145,14 @@ public class Grid implements IGameObject{
 		graphicsRender.setColor(Color.white);
 		
 		if(gameEnd) {
-			drawEndGameOverlay(graphicsRender);
+			//drawEndGameOverlay(graphicsRender);
 		}
-		
-	}
-	
-	private void drawEndGameOverlay(Graphics2D graphicsRender) {
-		graphicsRender.setColor(new Color(0,0,0, (int)(225 * 0.5f)));
-		
-		graphicsRender.fillRect(0, 0, Main.WIDTH, Main.HEIGHT);
-		graphicsRender.setColor(Color.white);
-		
-		if(winType == -1) {
-			//tie
-			graphicsRender.drawString("It's a TIE", 195, 235);
-		}else {
-			//won
-			graphicsRender.drawString((winType == 0 ? "X" : "O") + " has WON!", 175, 235);
-		}
-		
-		graphicsRender.drawString("Press anywhere to restart! :)", 85, 260);
 		
 	}
 
+
 	public void mouseMoved(MouseEvent e) {
-		if(gameEnd) {
+		if(!isActive) {
 			return;
 		}
 		
@@ -134,7 +161,12 @@ public class Grid implements IGameObject{
 		}
 	}
 
-	public void mouseReleased(MouseEvent e) {
+	public Placement mouseReleased(MouseEvent e, int markerIndex) {
+		this.markerIndex = markerIndex;
+		return mouseReleased(e);
+	}
+
+	public Placement mouseReleased(MouseEvent e) {
 		for (Placement placement : placements) {
 			if(placement.isActive()) {
 				
@@ -142,27 +174,42 @@ public class Grid implements IGameObject{
 				
 				int x = placement.getxIndex();
 				int y = placement.getyIndex();
-				markers[x][y] = new Marker(x, y, markerIndex);
-				
-				markerIndex ++;
-				
-				//check if player won?
-				ArrayList<Marker> winLine = Checker.checkWin(markers);
-				
-				
-				if(winLine!=null) {
-					winLine.forEach(marker -> marker.setWon(true));
-					winType = winLine.get(0).getType();
-					gameEnd = true;
-					
-				}else if(markerIndex >= Main.SIZE) {
-					gameEnd = true;
-				}
-				
+				placeMarker(x, y);
+				return placement;
 			}
 		}
 		
+		return null;
 	}
+	
+	public void placeMarker(int moveIndex) {
+		placeMarker(moveIndex % Main.ROWS, moveIndex / Main.ROWS);
+	}
+	
+	public void placeMarker(int x, int y, int markerIndex) {
+		this.markerIndex = markerIndex;
+		placeMarker(x,y);
+		
+	}
+	
+	private void placeMarker(int x, int y) {
+		markers[x][y] = new Marker(x, y, startX, startY, size, markerIndex);
+		
+		markerIndex ++;
+		markersPlaced++;
+		
+		winLine = Checker.checkWin(markers);
+		
+		if(winLine != null) {
+			winLine.forEach(marker -> marker.setWon(true));
+			winType = winLine.get(0).getType();
+			gameEnd = true;
+			
+		} else if(markersPlaced >= Main.SIZE) {
+			gameEnd = true;
+		}
+	}
+
 	
 	public void reset() {
 		for (int x = 0;  x < markers.length; x++) {
@@ -178,11 +225,40 @@ public class Grid implements IGameObject{
 		gameEnd = false;
 		winType = -1;
 		markerIndex = 0;
+		markersPlaced = 0;
+		isActive = true;
 	}
 	
 	public boolean isGameEnd() {
 		return gameEnd;
 	}
+	
+	public int getTurn() {
+		return markerIndex % 2;
+	}
+	public Marker[][] getMarkers() {
+		return markers;
+	}
+	
+	public int getWinner() {
+		return winLine == null ? -1 : winLine.get(0).getType();
+	}
+
+	public int getX() {
+		
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+		
+	}
+
+
 	
 
 }
